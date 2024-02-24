@@ -1,0 +1,21 @@
+name: Create a Version Number for NPM
+on: 
+  workflow_dispatch:
+  push: 
+    branches: [main, master, develop]
+
+jobs:
+  generate_version:
+    name: Generate NPM version number
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Generate and push version
+        id: generate_version
+        run: |
+          npm version patch && git push --follow-tags
