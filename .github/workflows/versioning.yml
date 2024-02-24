@@ -5,25 +5,18 @@ on:
     branches: [main, master, develop]
 
 jobs:
-  generate_version:
+  versioning:
     name: Generate version numbers
     permissions: write-all
+
     runs-on: ubuntu-latest
     outputs:
       full_version_tag: ${{ steps.getalltags.outputs.full_version_tag }}
-      nextMajor: ${{ steps.getalltags.outputs.nextMajor }}
-      nextMinor: ${{ steps.getalltags.outputs.nextMinor }}
-      nextPatch: ${{ steps.getalltags.outputs.nextPatch }}
-      nextversiontag: ${{ steps.selectversion.outputs.nextversiontag }}
+      next_major_tag: ${{ steps.getalltags.outputs.next_major_tag }}
+      next_minor_tag: ${{ steps.getalltags.outputs.next_minor_tag }}
+      next_patch_tag: ${{ steps.getalltags.outputs.next_patch_tag }}
+    
     steps:
-      - name: Enable caching
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pip
-            ~/.platformio/.cache
-          key: ${{ runner.os }}-pio
-
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
