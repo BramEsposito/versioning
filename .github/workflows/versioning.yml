@@ -1,0 +1,50 @@
+name: Create a Version Number
+on: 
+  workflow_dispatch:
+  push: 
+    branches: [main, master, develop]
+
+jobs:
+  generate_version:
+    name: Generate version numbers
+    permissions: write-all
+    runs-on: ubuntu-latest
+    outputs:
+      full_version_tag: ${{ steps.getalltags.outputs.full_version_tag }}
+      nextMajor: ${{ steps.getalltags.outputs.nextMajor }}
+      nextMinor: ${{ steps.getalltags.outputs.nextMinor }}
+      nextPatch: ${{ steps.getalltags.outputs.nextPatch }}
+      nextversiontag: ${{ steps.selectversion.outputs.nextversiontag }}
+    steps:
+      - name: Enable caching
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Get version data
+        id: getalltags
+        run: |
+          # create all possible next versions
+          declare full_version_tag=$(git describe --tags >/dev/null 2>&1 || echo "0.0.0")
+          echo "full_version_tag = $full_version_tag" >> $GITHUB_OUTPUT
+          echo "full_version_tag = $full_version_tag"
+          
+          declare next_major_tag=$( echo $full_version_tag | cut -d'.' -f1-3 | awk -F'.' '{print $1+1"."$2-$2"."$3-$3}')
+          echo "next_major_tag = $next_major_tag" >> $GITHUB_OUTPUT
+          echo "next_major_tag = $next_major_tag"
+
+          declare next_minor_tag=$( echo $full_version_tag | cut -d'.' -f1-3 | awk -F'_' '{print $1"_"$2+1"_"$3-$3}')
+          echo "next_minor_tag = $next_minor_tag" >> $GITHUB_OUTPUT
+          echo "next_minor_tag = $next_minor_tag"
+
+          declare next_patch_tag=$( echo $full_version_tag | cut -d'.' -f1-3 | awk -F'_' '{print $1"_"$2"_"$3+1}')
+          echo "next_patch_tag = $next_patch_tag" >> $GITHUB_OUTPUT
+          echo "next_patch_tag = $next_patch_tag"
