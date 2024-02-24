@@ -1,8 +1,9 @@
 name: Create a Version Number for NPM
 on: 
-  workflow_dispatch:
-  push: 
-    branches: [main, master, develop]
+  pull_request:
+    types:
+      - opened
+    branches: [main, master]
 
 jobs:
   generate_version:
@@ -10,12 +11,13 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
+      - name: Checkout PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr checkout ${{ github.event.pull_request.number }}
       - name: Generate and push version
         id: generate_version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm version patch && git push --follow-tags
