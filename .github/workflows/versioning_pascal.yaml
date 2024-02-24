@@ -1,0 +1,70 @@
+name: Create a Version Number (Pascal edition)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master, develop]
+
+jobs:
+  versioning:
+    name: Determine version, Test, Build and Release
+    permissions: write-all
+
+    runs-on: ubuntu-latest
+    outputs:
+      branchname: ${{ steps.versioninfo.outputs.branchname }}
+      commithash: ${{ steps.versioninfo.outputs.commithash }}
+      buildtimestamp: ${{ steps.versioninfo.outputs.buildtimestamp }}
+      lastmajordigit: ${{ steps.versioninfo.outputs.lastmajordigit }}
+      lastminordigit: ${{ steps.versioninfo.outputs.lastminordigit }}
+      lastpatchdigit: ${{ steps.versioninfo.outputs.lastpatchdigit }}
+      lastversion: ${{ steps.versioninfo.outputs.lastversion }}
+      nextmajordigit: ${{ steps.selectversion.outputs.nextmajordigit }}
+      nextminordigit: ${{ steps.selectversion.outputs.nextminordigit }}
+      nextpatchdigit: ${{ steps.selectversion.outputs.nextpatchdigit }}
+      buildversion: ${{ steps.selectversion.outputs.buildversion }}
+      buildversionfilename: ${{ steps.selectversion.outputs.buildversionfilename }}
+
+    steps:
+      - name: Enable caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version data
+        id: versioninfo
+        run: |
+          echo "extract branch name from github_ref '${{ github.ref }}'"
+          declare branchname=$(echo "${{ github.ref }}" | cut -d'/' -f 3-)
+          echo "clean branch name = $branchname"
+          echo "extract commit short hash : $(git rev-parse --short HEAD)"
+          declare commithash=$(git rev-parse --short HEAD)
+          echo "extract build timestamp"
+          declare buildtimestamp=$(date "+%Y-%b-%d-%H:%M:%S")
+          echo "buildtimestamp = $buildtimestamp"
+          declare fulltag=$(git describe --tag $(git rev-parse --verify refs/remotes/origin/main) >/dev/null 2>&1 || echo "0.0.0")
+          echo "fulltag = [$fulltag]"
+          declare versiontag=$(echo $fulltag | cut -d'-' -f1)
+          echo "extract SemVer numbers from version tag [$versiontag]"
+          declare -i lastmajordigit=$(echo $versiontag | cut -c 1- | cut -d'.' -f1)
+          echo "lastmajordigit = $lastmajordigit"
+          declare -i lastminordigit=$(echo $versiontag | cut -c 1- | cut -d'.' -f2)
+          echo "lastminordigit = $lastminordigit"
+          declare -i lastpatchdigit=$(echo $versiontag | cut -c 1- | cut -d'.' -f3)
+          echo "lastpatchdigit = $lastpatchdigit"
+          declare lastversion="v$lastmajordigit.$lastminordigit.$lastpatchdigit"
+          echo "output variables to GitHub Actions"
+          echo "branchname=$branchname" >> $GITHUB_OUTPUT
+          echo "lastmajordigit=$lastmajordigit" >> $GITHUB_OUTPUT
+          echo "lastminordigit=$lastminordigit" >> $GITHUB_OUTPUT
+          echo "lastpatchdigit=$lastpatchdigit" >> $GITHUB_OUTPUT
+          echo "commithash=$commithash" >> $GITHUB_OUTPUT
+          echo "buildtimestamp=$buildtimestamp" >> $GITHUB_OUTPUT
+          echo "lastversion=$lastversion" >> $GITHUB_OUTPUT
