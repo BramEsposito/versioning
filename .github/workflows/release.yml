@@ -1,20 +1,16 @@
 # .github/workflows/release.yml
-name: Release
-
+name: Release project
 on:
-  pull_request:
-    types: [closed]
+  workflow_dispatch:
 
 jobs:
-  build:
+  release:
+    name: Release
     runs-on: ubuntu-latest
 
-    if: github.event.pull_request.merged
-    
     steps:
-      - name: Tag
-        uses: K-Phoen/semver-release-action@master
-        with:
-          release_branch: main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Release
+        uses: huggingface/semver-release-action@latest
