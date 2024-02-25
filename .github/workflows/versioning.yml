@@ -61,7 +61,7 @@ jobs:
           echo "extract build timestamp"
           declare buildtimestamp=$(date "+%Y-%b-%d-%H:%M:%S")
           echo "buildtimestamp = $buildtimestamp"
-          declare fulltag=$(git describe --tag $(git rev-parse --verify refs/remotes/origin/main) >/dev/null 2>&1 || echo "0.0.0")
+          declare fulltag=$(git describe --tag $(git rev-parse --verify refs/remotes/origin/main) 2> || echo "0.0.0")
           echo "fulltag = [$fulltag]"
           declare versiontag=$(echo $fulltag | cut -d'-' -f1)
           echo "extract SemVer numbers from version tag [$versiontag]"
