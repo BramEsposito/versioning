@@ -1,6 +1,6 @@
 {
   "name": "versioning",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "test package to test automated versioning",
   "main": "index.js",
   "scripts": {
