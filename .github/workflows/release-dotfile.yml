@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   pull_request:
     types:
-      - closed
+      - opened
     branches: [main, master]
 
 jobs:
@@ -15,7 +15,6 @@ jobs:
     name: Generate a new version number
     permissions: write-all
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -24,8 +23,7 @@ jobs:
       - name: Checkout PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # run: gh pr checkout ${{ github.event.pull_request.number }}
-        run: git checkout ${{ github.ref }}
+        run: gh pr checkout ${{ github.event.pull_request.number }}
       - name: Generate and push version
         id: generate_version
         env:
