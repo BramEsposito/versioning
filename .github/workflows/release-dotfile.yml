@@ -31,8 +31,10 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Github Action"
-          npm version patch
-          version=$(git describe --abbrev=0 --tags)
+          npm version patch -git-tag-version=false
+          # version=$(git describe --abbrev=0 --tags)
+          version="v"$(npm pkg get version | xargs)
           echo $version > .version
+          git tag $version
           git add . && git commit -m "Version $version"
           git push --follow-tags
