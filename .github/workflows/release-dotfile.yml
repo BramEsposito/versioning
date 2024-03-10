@@ -15,7 +15,8 @@ jobs:
     name: Generate a new version number
     permissions: write-all
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == 'true'
+    - name: pull request
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
