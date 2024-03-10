@@ -35,6 +35,6 @@ jobs:
           # version=$(git describe --abbrev=0 --tags)
           version="v"$(npm pkg get version | xargs)
           echo $version > .version
-          git tag -a $version
+          git tag -a version -m "Version $version"
           git add . && git commit -m "Version $version"
           git push --follow-tags
