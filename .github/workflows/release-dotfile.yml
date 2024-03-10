@@ -2,7 +2,7 @@
 # 2. Write it to the .version file
 # 3. Create a new commit and push
 # 4. Tag that commit with the new version
-name: Release project
+name: Release project with .version
 on:
   workflow_dispatch:
   push: 
