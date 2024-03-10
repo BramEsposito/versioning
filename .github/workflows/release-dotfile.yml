@@ -25,7 +25,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # run: gh pr checkout ${{ github.event.pull_request.number }}
-        run: gh chceckout ${{ github.ref }}
+        run: git checkout ${{ github.ref }}
       - name: Generate and push version
         id: generate_version
         env:
